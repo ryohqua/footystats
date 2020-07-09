@@ -1,0 +1,55 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import xlwt
+
+pl_id = ["989", "11", "405", "1237", "1132", "631", "873", "29", "1003","31", "281", "985", "762", "1123", "350", "180", "148", "1010", "379", "543"]
+pl_name = ["afc-bournemouth", "fc-arsenal", "aston-villa"]
+#pl_ids = {"989": "afc-bournemouth", "11": "fc-arsenal"}
+link1 = "https://www.transfermarkt.us/"
+#liverpool-fc
+link2 = "/bilanz/verein/"
+#31
+link3 = "/plus/0?saison_id=2018&land_id=189&wettbewerb_id=GB1&clubs_in_comp_id=&heim_gast=&day=&punkte=&group=1&datum_von=-&datum_bis=-"
+
+
+book = xlwt.Workbook()
+#sh = book.add_sheet('A', True)
+
+headers = {'User-Agent':
+           'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36'}
+
+"""
+page = "https://www.transfermarkt.co.uk/transfers/transferrekorde/statistik/top/plus/0/galerie/0?saison_id=2000"
+pageTree = requests.get(page, headers=headers)
+pageSoup = BeautifulSoup(pageTree.content, 'html.parser')
+Players = pageSoup.find_all("a", {"class": "spielprofil_tooltip"})
+Values = pageSoup.find_all("td", {"class": "rechts hauptlink"})
+
+#Let's look at the first name in the Players list.
+
+for x in range(8):
+    print(Players[x].text)
+    sh.write(x,0,Players[x].text)
+    sh.write(x,1,Values[x].text)
+book.save('ddasdd.xls')
+"""
+
+
+for x in range(2):
+    comb_link = link1 + pl_name[x] + link2 + pl_id[x] + link3
+    pgTree = requests.get(comb_link, headers=headers)
+    pgSoup = BeautifulSoup(pgTree.content, 'html.parser')
+    TeamName = pgSoup.find_all("a", {"class": "vereinprofil_tooltip"})
+    WinRate = pgSoup.find_all("td", {"class": "rechts"})
+    sh = book.add_sheet(pl_name[x], True)
+    print(len(TeamName))
+    print(len(WinRate))
+    for i in range(len(TeamName)):
+        if (i%2) != 0:
+            sh.write(int(i/2), 0, TeamName[i].text)
+    for j in range(len(WinRate)):
+        if (j%2) == 0:
+            sh.write(int(j/2), 1, WinRate[j].text)
+
+book.save('TeamData.xls')
